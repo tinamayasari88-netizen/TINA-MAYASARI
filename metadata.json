@@ -1,0 +1,6 @@
+{
+  "name": "INTEGER ADVENTURE",
+  "description": "Aplikasi web edukasi matematika interaktif berbasis petualangan tentang operasi bilangan bulat untuk siswa SMP, lengkap dengan mode kompetisi kelas dan dashboard evaluasi guru.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

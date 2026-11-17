@@ -1,0 +1,241 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(ownerUid) {
+      return isVerifiedUser() && request.auth.uid == ownerUid;
+    }
+
+    function isAdmin() {
+      return isVerifiedUser() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        request.auth.token.email == 'tinamayasari88@gmail.com'
+      );
+    }
+
+    function isValidTeacher(data) {
+      return data.keys().hasAll(['id', 'name', 'email', 'updatedAt'])
+        && data.keys().hasOnly(['id', 'name', 'email', 'schoolName', 'updatedAt'])
+        && isValidId(data.id)
+        && data.id == request.auth.uid
+        && data.name is string && data.name.size() >= 1 && data.name.size() <= 120
+        && data.email is string && data.email.size() >= 3 && data.email.size() <= 160
+        && (!data.keys().hasAny(['schoolName']) || (data.schoolName is string && data.schoolName.size() <= 160))
+        && data.updatedAt is string && data.updatedAt.size() <= 64;
+    }
+
+    function isValidClassRoom(data) {
+      return data.keys().hasAll(['id', 'teacherId', 'name', 'classCode', 'passingGrade', 'createdAt'])
+        && data.keys().hasOnly(['id', 'teacherId', 'name', 'classCode', 'passingGrade', 'studentCount', 'createdAt'])
+        && isValidId(data.id)
+        && isValidId(data.teacherId)
+        && data.teacherId == request.auth.uid
+        && data.name is string && data.name.size() >= 1 && data.name.size() <= 100
+        && data.classCode is string && data.classCode.size() >= 2 && data.classCode.size() <= 24 && data.classCode.matches('^[A-Z0-9\\-]+$')
+        && data.passingGrade is number && data.passingGrade >= 0 && data.passingGrade <= 100
+        && (!data.keys().hasAny(['studentCount']) || (data.studentCount is number && data.studentCount >= 0))
+        && data.createdAt is string && data.createdAt.size() <= 64;
+    }
+
+    function isValidStudent(data) {
+      return data.keys().hasAll(['id', 'teacherId', 'classId', 'fullName', 'studentCode', 'avatarId', 'totalStars', 'unlockedLevel', 'createdAt'])
+        && data.keys().hasOnly(['id', 'teacherId', 'classId', 'fullName', 'studentCode', 'avatarId', 'totalStars', 'unlockedLevel', 'createdAt'])
+        && isValidId(data.id)
+        && isValidId(data.teacherId)
+        && isValidId(data.classId)
+        && data.teacherId == request.auth.uid
+        && data.fullName is string && data.fullName.size() >= 1 && data.fullName.size() <= 120
+        && data.studentCode is string && data.studentCode.size() >= 2 && data.studentCode.size() <= 24 && data.studentCode.matches('^[A-Z0-9\\-]+$')
+        && data.avatarId in ['boy', 'girl', 'owl']
+        && data.totalStars is number && data.totalStars >= 0 && data.totalStars <= 100
+        && data.unlockedLevel is number && data.unlockedLevel >= 1 && data.unlockedLevel <= 6
+        && data.createdAt is string && data.createdAt.size() <= 64;
+    }
+
+    function isValidGameSession(data) {
+      return data.keys().hasAll(['id', 'teacherId', 'classId', 'title', 'levelId', 'topic', 'mode', 'status', 'createdAt'])
+        && data.keys().hasOnly(['id', 'teacherId', 'classId', 'title', 'levelId', 'topic', 'questionCount', 'durationMinutes', 'mode', 'status', 'createdAt'])
+        && isValidId(data.id)
+        && isValidId(data.teacherId)
+        && isValidId(data.classId)
+        && data.teacherId == request.auth.uid
+        && data.title is string && data.title.size() >= 1 && data.title.size() <= 160
+        && data.levelId is number && data.levelId >= 1 && data.levelId <= 6
+        && data.topic is string && data.topic.size() >= 1 && data.topic.size() <= 120
+        && (!data.keys().hasAny(['questionCount']) || (data.questionCount is number && data.questionCount >= 1 && data.questionCount <= 50))
+        && (!data.keys().hasAny(['durationMinutes']) || (data.durationMinutes is number && data.durationMinutes >= 1 && data.durationMinutes <= 180))
+        && data.mode in ['practice', 'evaluation', 'competition']
+        && data.status in ['active', 'ended']
+        && data.createdAt is string && data.createdAt.size() <= 64;
+    }
+
+    function isValidCompetitionRoom(data) {
+      return data.keys().hasAll(['id', 'teacherId', 'classId', 'roomCode', 'status', 'levelId', 'createdAt'])
+        && data.keys().hasOnly(['id', 'teacherId', 'classId', 'roomCode', 'status', 'levelId', 'createdAt'])
+        && isValidId(data.id)
+        && isValidId(data.teacherId)
+        && isValidId(data.classId)
+        && data.teacherId == request.auth.uid
+        && data.roomCode is string && data.roomCode.size() >= 3 && data.roomCode.size() <= 24 && data.roomCode.matches('^[A-Z0-9\\-]+$')
+        && data.status in ['waiting', 'active', 'ended']
+        && data.levelId is number && data.levelId >= 1 && data.levelId <= 6
+        && data.createdAt is string && data.createdAt.size() <= 64;
+    }
+
+    function isValidEvaluation(data) {
+      return data.keys().hasAll(['id', 'teacherId', 'classId', 'studentId', 'studentName', 'levelId', 'levelName', 'totalQuestions', 'correctCount', 'wrongCount', 'score', 'starsEarned', 'durationSeconds', 'isPassed', 'executedAt'])
+        && data.keys().hasOnly(['id', 'teacherId', 'classId', 'studentId', 'studentName', 'levelId', 'levelName', 'totalQuestions', 'correctCount', 'wrongCount', 'score', 'starsEarned', 'durationSeconds', 'isPassed', 'executedAt'])
+        && isValidId(data.id)
+        && isValidId(data.teacherId)
+        && isValidId(data.classId)
+        && isValidId(data.studentId)
+        && data.teacherId == request.auth.uid
+        && data.studentName is string && data.studentName.size() >= 1 && data.studentName.size() <= 120
+        && data.levelId is number && data.levelId >= 1 && data.levelId <= 6
+        && data.levelName is string && data.levelName.size() >= 1 && data.levelName.size() <= 120
+        && data.totalQuestions is number && data.totalQuestions >= 1 && data.totalQuestions <= 100
+        && data.correctCount is number && data.correctCount >= 0 && data.correctCount <= 100
+        && data.wrongCount is number && data.wrongCount >= 0 && data.wrongCount <= 100
+        && data.score is number && data.score >= 0 && data.score <= 100
+        && data.starsEarned is number && data.starsEarned >= 0 && data.starsEarned <= 3
+        && data.durationSeconds is number && data.durationSeconds >= 0
+        && data.isPassed is bool
+        && data.executedAt is string && data.executedAt.size() <= 64;
+    }
+
+    function isValidStudentBadge(data) {
+      return data.keys().hasAll(['id', 'teacherId', 'studentId', 'badgeId', 'unlockedAt'])
+        && data.keys().hasOnly(['id', 'teacherId', 'studentId', 'badgeId', 'unlockedAt'])
+        && isValidId(data.id)
+        && isValidId(data.teacherId)
+        && isValidId(data.studentId)
+        && data.teacherId == request.auth.uid
+        && data.badgeId is string && data.badgeId.size() >= 1 && data.badgeId.size() <= 64 && data.badgeId.matches('^[a-z0-9_]+$')
+        && data.unlockedAt is string && data.unlockedAt.size() <= 64;
+    }
+
+    match /admins/{userId} {
+      allow get: if isOwner(userId);
+      allow list, create, update, delete: if false;
+    }
+
+    match /teachers/{teacherId} {
+      allow get: if isValidId(teacherId) && (isOwner(teacherId) || isAdmin());
+      allow list: if false;
+      allow create: if isValidId(teacherId) && isOwner(teacherId) && isValidTeacher(incoming());
+      allow update: if isValidId(teacherId) && isValidTeacher(incoming()) && (
+        isAdmin() || (
+          isOwner(teacherId)
+          && incoming().id == existing().id
+          && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'schoolName', 'updatedAt'])
+        )
+      );
+      allow delete: if false;
+    }
+
+    match /classes/{classId} {
+      allow get: if isValidId(classId) && (isOwner(existing().teacherId) || isAdmin());
+      allow list: if isVerifiedUser() && (existing().teacherId == request.auth.uid || isAdmin());
+      allow create: if isValidId(classId) && isVerifiedUser() && isValidClassRoom(incoming());
+      allow update: if isValidId(classId) && isValidClassRoom(incoming()) && (
+        isAdmin() || (
+          isOwner(existing().teacherId)
+          && incoming().teacherId == existing().teacherId
+          && incoming().createdAt == existing().createdAt
+          && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'passingGrade', 'studentCount'])
+        )
+      );
+      allow delete: if isValidId(classId) && (isOwner(existing().teacherId) || isAdmin());
+    }
+
+    match /students/{studentId} {
+      allow get: if isValidId(studentId) && (isOwner(existing().teacherId) || isAdmin());
+      allow list: if isVerifiedUser() && (existing().teacherId == request.auth.uid || isAdmin());
+      allow create: if isValidId(studentId) && isVerifiedUser() && isValidStudent(incoming())
+        && exists(/databases/$(database)/documents/classes/$(incoming().classId));
+      allow update: if isValidId(studentId) && isValidStudent(incoming()) && (
+        isAdmin() || (
+          isOwner(existing().teacherId)
+          && incoming().teacherId == existing().teacherId
+          && incoming().classId == existing().classId
+          && incoming().createdAt == existing().createdAt
+          && incoming().diff(existing()).affectedKeys().hasOnly(['fullName', 'avatarId', 'totalStars', 'unlockedLevel'])
+        )
+      );
+      allow delete: if isValidId(studentId) && (isOwner(existing().teacherId) || isAdmin());
+    }
+
+    match /gameSessions/{sessionId} {
+      allow get: if isValidId(sessionId) && (isOwner(existing().teacherId) || isAdmin());
+      allow list: if isVerifiedUser() && (existing().teacherId == request.auth.uid || isAdmin());
+      allow create: if isValidId(sessionId) && isVerifiedUser() && isValidGameSession(incoming())
+        && exists(/databases/$(database)/documents/classes/$(incoming().classId));
+      allow update: if isValidId(sessionId) && isValidGameSession(incoming()) && (
+        isAdmin() || (
+          isOwner(existing().teacherId)
+          && existing().status != 'ended'
+          && incoming().teacherId == existing().teacherId
+          && incoming().createdAt == existing().createdAt
+          && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'title'])
+        )
+      );
+      allow delete: if isValidId(sessionId) && (isOwner(existing().teacherId) || isAdmin());
+    }
+
+    match /competitionRooms/{roomId} {
+      allow get: if isValidId(roomId) && (isOwner(existing().teacherId) || isAdmin());
+      allow list: if isVerifiedUser() && (existing().teacherId == request.auth.uid || isAdmin());
+      allow create: if isValidId(roomId) && isVerifiedUser() && isValidCompetitionRoom(incoming())
+        && exists(/databases/$(database)/documents/classes/$(incoming().classId));
+      allow update: if isValidId(roomId) && isValidCompetitionRoom(incoming()) && (
+        isAdmin() || (
+          isOwner(existing().teacherId)
+          && existing().status != 'ended'
+          && incoming().teacherId == existing().teacherId
+          && incoming().createdAt == existing().createdAt
+          && incoming().diff(existing()).affectedKeys().hasOnly(['status'])
+        )
+      );
+      allow delete: if isValidId(roomId) && (isOwner(existing().teacherId) || isAdmin());
+    }
+
+    match /evaluations/{evaluationId} {
+      allow get: if isValidId(evaluationId) && (isOwner(existing().teacherId) || isAdmin());
+      allow list: if isVerifiedUser() && (existing().teacherId == request.auth.uid || isAdmin());
+      allow create: if isValidId(evaluationId) && isVerifiedUser() && isValidEvaluation(incoming());
+      allow update: if false;
+      allow delete: if isValidId(evaluationId) && (isOwner(existing().teacherId) || isAdmin());
+    }
+
+    match /studentBadges/{badgeKey} {
+      allow get: if isValidId(badgeKey) && (isOwner(existing().teacherId) || isAdmin());
+      allow list: if isVerifiedUser() && (existing().teacherId == request.auth.uid || isAdmin());
+      allow create: if isValidId(badgeKey) && isVerifiedUser() && isValidStudentBadge(incoming());
+      allow update: if false;
+      allow delete: if isValidId(badgeKey) && (isOwner(existing().teacherId) || isAdmin());
+    }
+  }
+}

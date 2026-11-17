@@ -1,0 +1,209 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: #f8fafc;
+    color: #0f172a;
+  }
+
+  h1, h2, h3, .font-display {
+    font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  }
+
+  .font-mono-num {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Cheerful adventure game canvas & tactile UI surfaces */
+.game-canvas {
+  background-color: #f3f9ff;
+  background-image:
+    radial-gradient(circle at 10% 12%, rgba(56, 189, 248, 0.16) 0%, transparent 32%),
+    radial-gradient(circle at 88% 8%, rgba(251, 191, 36, 0.18) 0%, transparent 30%),
+    radial-gradient(circle at 82% 84%, rgba(168, 85, 247, 0.12) 0%, transparent 34%),
+    radial-gradient(circle at 18% 86%, rgba(52, 211, 153, 0.1) 0%, transparent 28%),
+    radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 26px 26px;
+}
+
+.game-card {
+  border: 2px solid #e2e8f0;
+  border-radius: 1.5rem;
+  background-color: #ffffff;
+  box-shadow: 0 6px 0 rgba(148, 163, 184, 0.16);
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms ease;
+}
+
+.game-card-interactive:hover {
+  transform: translateY(-2px);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.game-btn-orange {
+  background: linear-gradient(180deg, #fb923c 0%, #f97316 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 0 #c2410c;
+  transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 120ms ease, filter 120ms ease;
+}
+.game-btn-orange:hover:not(:disabled) {
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 #c2410c;
+}
+.game-btn-orange:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #c2410c;
+}
+
+.game-btn-blue {
+  background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 0 #1d4ed8;
+  transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 120ms ease, filter 120ms ease;
+}
+.game-btn-blue:hover:not(:disabled) {
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 #1d4ed8;
+}
+.game-btn-blue:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #1d4ed8;
+}
+
+.game-btn-purple {
+  background: linear-gradient(180deg, #a855f7 0%, #9333ea 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 0 #6b21a8;
+  transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 120ms ease, filter 120ms ease;
+}
+.game-btn-purple:hover:not(:disabled) {
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 #6b21a8;
+}
+.game-btn-purple:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #6b21a8;
+}
+
+.game-btn-emerald {
+  background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 0 #047857;
+  transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 120ms ease, filter 120ms ease;
+}
+.game-btn-emerald:hover:not(:disabled) {
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 0 #047857;
+}
+.game-btn-emerald:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #047857;
+}
+
+.game-btn-back {
+  background-color: #ffffff;
+  color: #1e293b;
+  border: 2px solid #cbd5e1;
+  box-shadow: 0 3px 0 #cbd5e1;
+  transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 120ms ease, background-color 120ms ease;
+}
+.game-btn-back:hover:not(:disabled) {
+  background-color: #f8fafc;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 0 #94a3b8;
+}
+.game-btn-back:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #94a3b8;
+}
+
+@keyframes floatGentle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes lanternDriftA {
+  0%, 100% {
+    transform: translate3d(0px, 0px, 0);
+  }
+  50% {
+    transform: translate3d(8px, -10px, 0);
+  }
+}
+
+@keyframes lanternDriftB {
+  0%, 100% {
+    transform: translate3d(0px, 0px, 0);
+  }
+  50% {
+    transform: translate3d(-8px, 8px, 0);
+  }
+}
+
+@keyframes hopBounce {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  45% {
+    transform: translateY(-10px) scale(1.04);
+  }
+}
+
+.animate-float-gentle {
+  animation: floatGentle 3.2s ease-in-out infinite;
+}
+
+.animate-lantern-a {
+  animation: lanternDriftA 3.4s ease-in-out infinite;
+}
+
+.animate-lantern-b {
+  animation: lanternDriftB 3.8s ease-in-out infinite;
+}
+
+.animate-lantern-a:hover,
+.animate-lantern-b:hover {
+  animation-play-state: paused;
+}
+
+.animate-hop-bounce {
+  animation: hopBounce 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-gentle,
+  .animate-lantern-a,
+  .animate-lantern-b,
+  .animate-hop-bounce {
+    animation: none;
+  }
+  .game-card-interactive:hover,
+  .game-btn-orange:hover:not(:disabled),
+  .game-btn-blue:hover:not(:disabled),
+  .game-btn-purple:hover:not(:disabled),
+  .game-btn-back:hover:not(:disabled) {
+    transform: none;
+  }
+}

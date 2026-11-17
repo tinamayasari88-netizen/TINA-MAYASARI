@@ -1,0 +1,149 @@
+{
+  "entities": {
+    "Teacher": {
+      "title": "Teacher",
+      "description": "Authenticated teacher profile for INTEGER ADVENTURE.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "email": { "type": "string", "format": "email", "minLength": 3, "maxLength": 160 },
+        "schoolName": { "type": "string", "minLength": 0, "maxLength": 160 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "email", "updatedAt"]
+    },
+    "ClassRoom": {
+      "title": "ClassRoom",
+      "description": "Classroom managed by a teacher with passing grade threshold.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "teacherId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "classCode": { "type": "string", "minLength": 2, "maxLength": 24, "pattern": "^[A-Z0-9\\-]+$" },
+        "passingGrade": { "type": "number" },
+        "studentCount": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "teacherId", "name", "classCode", "passingGrade", "createdAt"]
+    },
+    "Student": {
+      "title": "Student",
+      "description": "Student roster entry linked to a class and teacher.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "teacherId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "classId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "fullName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "studentCode": { "type": "string", "minLength": 2, "maxLength": 24, "pattern": "^[A-Z0-9\\-]+$" },
+        "avatarId": { "type": "string", "enum": ["boy", "girl", "owl"] },
+        "totalStars": { "type": "number" },
+        "unlockedLevel": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "teacherId", "classId", "fullName", "studentCode", "avatarId", "totalStars", "unlockedLevel", "createdAt"]
+    },
+    "GameSession": {
+      "title": "GameSession",
+      "description": "Teacher-configured game or evaluation session.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "teacherId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "classId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "levelId": { "type": "number" },
+        "topic": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "questionCount": { "type": "number" },
+        "durationMinutes": { "type": "number" },
+        "mode": { "type": "string", "enum": ["practice", "evaluation", "competition"] },
+        "status": { "type": "string", "enum": ["active", "ended"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "teacherId", "classId", "title", "levelId", "topic", "mode", "status", "createdAt"]
+    },
+    "CompetitionRoom": {
+      "title": "CompetitionRoom",
+      "description": "Real-time class competition room created by a teacher.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "teacherId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "classId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "roomCode": { "type": "string", "minLength": 3, "maxLength": 24, "pattern": "^[A-Z0-9\\-]+$" },
+        "status": { "type": "string", "enum": ["waiting", "active", "ended"] },
+        "levelId": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "teacherId", "classId", "roomCode", "status", "levelId", "createdAt"]
+    },
+    "Evaluation": {
+      "title": "Evaluation",
+      "description": "Completed student evaluation summary synced to teacher cloud storage.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "teacherId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "classId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "studentId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "studentName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "levelId": { "type": "number" },
+        "levelName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "totalQuestions": { "type": "number" },
+        "correctCount": { "type": "number" },
+        "wrongCount": { "type": "number" },
+        "score": { "type": "number" },
+        "starsEarned": { "type": "number" },
+        "durationSeconds": { "type": "number" },
+        "isPassed": { "type": "boolean" },
+        "executedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "teacherId", "classId", "studentId", "studentName", "levelId", "levelName", "totalQuestions", "correctCount", "wrongCount", "score", "starsEarned", "durationSeconds", "isPassed", "executedAt"]
+    },
+    "StudentBadge": {
+      "title": "StudentBadge",
+      "description": "Collectible achievement badge earned by a student.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "teacherId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "studentId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "badgeId": { "type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[a-z0-9_]+$" },
+        "unlockedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "teacherId", "studentId", "badgeId", "unlockedAt"]
+    }
+  },
+  "firestore": {
+    "/teachers/{teacherId}": {
+      "schema": { "$ref": "#/entities/Teacher" },
+      "description": "Authenticated teacher profile documents."
+    },
+    "/classes/{classId}": {
+      "schema": { "$ref": "#/entities/ClassRoom" },
+      "description": "Classroom records created and owned by teachers."
+    },
+    "/students/{studentId}": {
+      "schema": { "$ref": "#/entities/Student" },
+      "description": "Student records within teacher classrooms."
+    },
+    "/gameSessions/{sessionId}": {
+      "schema": { "$ref": "#/entities/GameSession" },
+      "description": "Teacher-created game and evaluation sessions."
+    },
+    "/competitionRooms/{roomId}": {
+      "schema": { "$ref": "#/entities/CompetitionRoom" },
+      "description": "Competition room states and metadata."
+    },
+    "/evaluations/{evaluationId}": {
+      "schema": { "$ref": "#/entities/Evaluation" },
+      "description": "Student evaluation results synced to teacher cloud database."
+    },
+    "/studentBadges/{badgeKey}": {
+      "schema": { "$ref": "#/entities/StudentBadge" },
+      "description": "Unlocked collectible achievement badges per student."
+    }
+  }
+}

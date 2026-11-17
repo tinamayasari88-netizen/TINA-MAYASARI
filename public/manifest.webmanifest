@@ -1,0 +1,19 @@
+{
+  "id": "/",
+  "name": "INTEGER ADVENTURE",
+  "short_name": "IntegerAdv",
+  "description": "Jelajahi Dunia Bilangan, Taklukkan Tantangan Matematika! Permainan edukasi operasi bilangan bulat untuk siswa SMP.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "theme_color": "#1D4ED8",
+  "background_color": "#F8FAFC",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
